@@ -131,7 +131,7 @@ export default function AdminTable({
                             <Eye size={14} />
                           </button>
                         )}
-                        {onValidate && row.statut === 'en_attente' && (
+                        {onValidate && (row.valide === false || row.statut === 'en_attente') && (
                           <button title="Valider" onClick={() => onValidate(row.id)}
                             style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid #d1fae5', background: '#ecfdf5', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#065f46', transition: 'background .15s' }}
                             onMouseOver={e => e.currentTarget.style.background = '#a7f3d0'}
@@ -139,7 +139,7 @@ export default function AdminTable({
                             <CheckCircle size={14} />
                           </button>
                         )}
-                        {onReject && row.statut === 'en_attente' && (
+                        {onReject && (row.valide === false || row.statut === 'en_attente') && (
                           <button title="Rejeter" onClick={() => onReject(row.id)}
                             style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid #fee2e2', background: '#fef2f2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#991b1b', transition: 'background .15s' }}
                             onMouseOver={e => e.currentTarget.style.background = '#fecaca'}

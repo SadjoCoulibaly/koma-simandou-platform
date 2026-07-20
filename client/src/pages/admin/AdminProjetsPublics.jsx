@@ -14,28 +14,21 @@ const LAUNCHED = ['en_cours', 'suspendu', 'termine']
 const COLUMNS = [
   { key: 'titre',          label: 'Projet',         render: (v) => <span className="font-semibold text-pine">{v}</span> },
   { key: 'secteur',        label: 'Secteur',        muted: true },
-  { key: 'maitre_ouvrage', label: "Maître d'ouvrage", muted: true },
+  { key: 'soumis_par_nom', label: 'Soumis par',     muted: true,
+    render: (v, row) => v
+      ? <div style={{ lineHeight: 1.4 }}>
+          <span style={{ display: 'block', fontWeight: 600, color: 'var(--koma-text)', fontSize: 13 }}>{v}</span>
+          {row.soumis_par_organisation && <span style={{ fontSize: 11.5, color: '#6b7280' }}>{row.soumis_par_organisation}</span>}
+        </div>
+      : <span style={{ color: '#C5CEDE' }}>—</span> },
   { key: 'budget_estime',  label: 'Volume financier',
     render: (v, row) => v
       ? <span className="font-semibold text-pine text-[13px]">{Number(v).toLocaleString('fr-FR')} <span className="font-normal text-[11px] text-[#8A9A90]">{row.devise || 'GNF'}</span></span>
       : <span className="text-[#C5CEDE]">—</span> },
-  { key: 'contenu_local_pct', label: 'Contenu local',
-    render: (v) => v != null
-      ? <span style={{ background: '#FEF3E0', color: '#854F0B', borderRadius: '999px', padding: '2px 8px', fontSize: '12px', fontWeight: 600 }}>{v}%</span>
-      : <span className="text-[#C5CEDE]">—</span> },
-  { key: 'avancement_pct', label: 'Avancement',
-    render: (v, row) => {
-      if (!LAUNCHED.includes(row.statut)) return <span className="text-[11px] text-[#8A9A90]">Non lancé</span>
-      const pct = v != null ? Number(v) : 0
-      return (
-        <div className="flex items-center gap-2 min-w-[80px]">
-          <div style={{ width: 56, height: 5, borderRadius: 4, background: '#E8ECF2', overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${pct}%`, background: '#1C7A4D', borderRadius: 4, transition: 'width .3s' }} />
-          </div>
-          <span style={{ fontSize: 12, fontWeight: 600, color: '#0D1B2E' }}>{pct}%</span>
-        </div>
-      )
-    }},
+  { key: 'valide', label: 'Validation',
+    render: (v) => v
+      ? <span style={{ display: 'inline-block', background: '#D1FAE5', color: '#065F46', borderRadius: 50, padding: '3px 10px', fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap' }}>Validé</span>
+      : <span style={{ display: 'inline-block', background: '#FEF3E0', color: '#92400E', borderRadius: 50, padding: '3px 10px', fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap' }}>En attente</span> },
   { key: 'statut',     label: 'Statut',    render: (v) => <StatutBadge statut={v} /> },
   { key: 'created_at', label: 'Soumis le', muted: true, render: (v) => v ? new Date(v).toLocaleDateString('fr-FR') : '—' },
 ]
