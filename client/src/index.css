@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── Legacy tokens (conservés pour compatibilité) ── */
+    --ink:  #0A1628;
+    --pine: #0D1B2E;
+    --bone: #F5F6F9;
+    --gold: #C49A45;
+    --gold-soft: #DDB96A;
+    --rust: #B23A2E;
+
+    /* ── KOMA Design System (INPI-inspired) ── */
+    --koma-teal:       #00798C;
+    --koma-teal-dark:  #00263B;
+    --koma-teal-light: #EBFCFF;
+    --koma-red:        #D63E44;
+    --koma-red-hover:  #C50000;
+    --koma-pink-light: #FFF6F7;
+    --koma-text:       #2A2A2F;
+    --koma-border:     #757580;
+    --koma-gray-bg:    #F3F4F6;
+    --koma-white:      #FFFFFF;
+
+    --font-heading: 'Raleway', sans-serif;
+    --font-body:    'Inter', sans-serif;
+
+    --radius-sm:   8px;
+    --radius-md:   12px;
+    --radius-pill: 50px;
+    --sidebar-width: 252px;
+  }
+
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--koma-gray-bg);
+    color: var(--koma-text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1 {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 3rem;
+    color: var(--koma-text);
+    line-height: 1.15;
+    letter-spacing: -.02em;
+  }
+  h2 {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 2.2rem;
+    color: var(--koma-text);
+    line-height: 1.2;
+  }
+  h3 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--koma-text);
+    line-height: 1.3;
+  }
+}
+
+@layer components {
+  /* ── Bouton primaire KOMA ── */
+  .btn-koma-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--koma-red);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 14px 32px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background .18s;
+  }
+  .btn-koma-primary:hover { background: var(--koma-red-hover); }
+
+  /* ── Bouton secondaire ── */
+  .btn-koma-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #fff;
+    color: var(--koma-red);
+    border: 2px solid var(--koma-red);
+    border-radius: var(--radius-pill);
+    padding: 12px 30px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all .18s;
+  }
+  .btn-koma-secondary:hover { background: var(--koma-red); color: #fff; }
+
+  /* ── Input KOMA ── */
+  .input-koma {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--koma-border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--koma-text);
+    background: #fff;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    box-sizing: border-box;
+  }
+  .input-koma:focus {
+    border-color: var(--koma-teal);
+    box-shadow: 0 0 0 2px rgba(0,121,140,.18);
+  }
+
+  /* ── Séparateur de section ── */
+  .koma-divider {
+    border: none;
+    border-top: 2px solid var(--koma-teal);
+    margin: 12px 0 24px;
+  }
+
+  /* ── Breadcrumb ── */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--koma-text);
+    flex-wrap: wrap;
+  }
+  .breadcrumb a {
+    color: var(--koma-text);
+    text-decoration: underline;
+  }
+  .breadcrumb .sep { color: #757580; }
+  .breadcrumb .current { color: #757580; }
+
+  /* ── Carte d'action ── */
+  .koma-action-card {
+    background: var(--koma-teal-light);
+    border-radius: var(--radius-sm);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: filter .15s;
+  }
+  .koma-action-card:hover { filter: brightness(.96); }
+
+  /* ── Carte info ── */
+  .koma-info-card {
+    background: #fff;
+    border: 1px solid #eeeeee;
+    border-radius: var(--radius-sm);
+    padding: 20px 24px;
+  }
+
+  /* ── Eyebrow label ── */
+  .eyebrow {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--koma-teal);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    height: 2px;
+    background: var(--koma-teal);
+    border-radius: 2px;
+  }
+
+  /* ── Grain & contour (conservés) ── */
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .fade-in {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1);
+  }
+  .fade-in.visible { opacity: 1; transform: none; }
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--koma-gray-bg); }
+::-webkit-scrollbar-thumb { background: var(--koma-teal); border-radius: 4px; }
