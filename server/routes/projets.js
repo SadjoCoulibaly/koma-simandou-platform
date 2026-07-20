@@ -78,8 +78,7 @@ router.post('/publics', async (req, res, next) => {
     if (!payload.titre?.trim()) {
       return res.status(400).json({ message: 'Le titre du projet est obligatoire.' })
     }
-    // Force en attente de validation, non visible publiquement
-    payload.statut = 'en_attente'
+    // Non visible publiquement tant que non validé
     payload.valide = false
     const { data, error } = await supabase.from('projets_publics').insert(payload).select().single()
     if (error) throw error
