@@ -24,17 +24,17 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.access_token) {
         localStorage.setItem('sb-access-token', session.access_token)
       }
-      await fetchRole(session?.user?.id ?? null)
       setLoading(false)
+      fetchRole(session?.user?.id ?? null)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.access_token) {
@@ -42,8 +42,8 @@ export function AuthProvider({ children }) {
       } else {
         localStorage.removeItem('sb-access-token')
       }
-      await fetchRole(session?.user?.id ?? null)
       setLoading(false)
+      fetchRole(session?.user?.id ?? null)
     })
 
     return () => subscription.unsubscribe()

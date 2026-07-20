@@ -23,21 +23,22 @@ export async function requireAuth(req, res, next) {
 
 export async function requireAdmin(req, res, next) {
   try {
-    // 1. app_metadata (défini via Supabase admin API)
     if (req.user?.app_metadata?.role === 'admin') return next()
 
-    // 2. Table profiles
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', req.user.id)
-      .single()
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('profiles_timeout')), 5000)
+    )
+    const query = supabase.from('profiles').select('role').eq('id', req.user.id).single()
+    const { data, error } = await Promise.race([query, timeout])
 
     if (error || data?.role !== 'admin') {
       return res.status(403).json({ message: 'Accès réservé aux administrateurs' })
     }
     next()
   } catch (err) {
+    if (err.message === 'profiles_timeout') {
+      return res.status(403).json({ message: 'Accès réservé aux administrateurs' })
+    }
     next(err)
   }
 }

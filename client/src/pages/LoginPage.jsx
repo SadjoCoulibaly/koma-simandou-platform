@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { supabase } from '../lib/supabase'
 import { Eye, EyeOff, UserPlus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -23,10 +22,8 @@ export default function LoginPage() {
     setLoading(true)
     try {
       const data = await signIn(form.email, form.password)
-      const userId = data?.user?.id
-      if (!userId) throw new Error('Connexion échouée')
-      const { data: profile } = await supabase.from('profiles').select('role').eq('id', userId).single()
-      navigate(profile?.role === 'admin' ? '/admin' : '/dashboard')
+      if (!data?.user?.id) throw new Error('Connexion échouée')
+      navigate(data.user.app_metadata?.role === 'admin' ? '/admin' : '/dashboard')
     } catch (err) {
       setError(err.message || 'Identifiants incorrects')
     } finally {
