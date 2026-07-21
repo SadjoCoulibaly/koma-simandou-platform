@@ -153,7 +153,7 @@ router.delete('/publics/:id', requireAuth, requireAdmin, async (req, res, next) 
 })
 
 // ── Projets privés ───────────────────────────────────────────
-router.get('/prives', async (req, res, next) => {
+router.get('/prives', requireAuth, async (req, res, next) => {
   try {
     const { page = 1, limit = 20, categorie, statut, search } = req.query
     const isDefault = !categorie && !statut && !search
@@ -180,7 +180,7 @@ router.get('/prives', async (req, res, next) => {
   } catch (err) { next(err) }
 })
 
-router.get('/prives/:id', async (req, res, next) => {
+router.get('/prives/:id', requireAuth, async (req, res, next) => {
   try {
     const { data, error } = await supabase.from('projets_prives')
       .select(PUBLIC_PRIVES_SELECT)

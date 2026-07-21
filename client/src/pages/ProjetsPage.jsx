@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useAuth } from '../context/AuthContext'
 import { Search, FolderOpen, MapPin, TrendingUp, X, Calendar, Users, Building2, CheckSquare, Layers } from 'lucide-react'
 import { projetsPublicsApi, projetsPrivesApi } from '../lib/api'
 import { useTranslation } from 'react-i18next'
@@ -202,6 +203,7 @@ function ProjetCard({ projet, onClick, t }) {
 
 export default function ProjetsPage() {
   const { t } = useTranslation()
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('publics')
   const [data, setData]           = useState([])
   const [total, setTotal]         = useState(0)
@@ -213,6 +215,10 @@ export default function ProjetsPage() {
 
   const load = (p = 1, s = search, tab = activeTab) => {
     setLoading(true)
+    if (tab === 'prives' && !user) {
+      setData([]); setTotal(0); setLoading(false)
+      return
+    }
     const api    = tab === 'publics' ? projetsPublicsApi : projetsPrivesApi
     const params = { page: p, limit: LIMIT }
     if (s.trim()) params.search = s.trim()
@@ -223,6 +229,7 @@ export default function ProjetsPage() {
   }
 
   useEffect(() => { load() }, [])
+  useEffect(() => { if (activeTab === 'prives') load(1, search, 'prives') }, [user])
 
   const switchTab = (tab) => { setActiveTab(tab); setPage(1); setSearch(''); load(1, '', tab) }
   const handleSearch = (v) => { setSearch(v); setPage(1); load(1, v, activeTab) }
@@ -284,7 +291,14 @@ export default function ProjetsPage() {
         ) : data.length === 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 0', color: '#9ca3af', gap: 12 }}>
             <FolderOpen size={48} style={{ opacity: .3 }} />
-            <p style={{ fontSize: 15, margin: 0 }}>{t('projets.noResults')}</p>
+            {activeTab === 'prives' && !user ? (
+              <>
+                <p style={{ fontSize: 15, margin: 0 }}>Connectez-vous pour voir les projets d'investissement privés</p>
+                <a href="/login" style={{ fontSize: 13.5, color: 'var(--koma-teal)', fontWeight: 700, textDecoration: 'none' }}>Se connecter →</a>
+              </>
+            ) : (
+              <p style={{ fontSize: 15, margin: 0 }}>{t('projets.noResults')}</p>
+            )}
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
