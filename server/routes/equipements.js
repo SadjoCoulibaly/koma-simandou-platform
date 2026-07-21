@@ -26,7 +26,7 @@ const MAP_SELECT = [
   'id', 'categorie', 'marque_modele', 'numero_serie', 'annee_mise_en_service',
   'etat', 'quantite', 'disponible', 'valeur_estimee',
   'latitude', 'longitude', 'localisation_texte',
-  'entreprise_nom', 'entreprise_tel', 'photo_url', 'description',
+  'entreprise_nom', 'entreprise_tel', 'photo_url',
   'entreprises(nom, telephone, email, experience_simandou)',
 ].join(', ')
 
