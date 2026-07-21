@@ -21,6 +21,15 @@ function pick(obj, fields) {
   )
 }
 
+// Colonnes publiques nécessaires pour la carte, les popups, la liste et la modale
+const MAP_SELECT = [
+  'id', 'categorie', 'marque_modele', 'numero_serie', 'annee_mise_en_service',
+  'etat', 'quantite', 'disponible', 'valeur_estimee',
+  'latitude', 'longitude', 'localisation_texte',
+  'entreprise_nom', 'entreprise_tel', 'photo_url', 'description',
+  'entreprises(nom, telephone, email, experience_simandou)',
+].join(', ')
+
 // ── GET /api/equipements ──────────────────────────────────────
 router.get('/', async (req, res, next) => {
   try {
@@ -31,7 +40,7 @@ router.get('/', async (req, res, next) => {
     function buildQuery(from, to) {
       let q = supabase
         .from('equipements')
-        .select('*, entreprises(nom, telephone, email, logo_url, site_web, secteur, ville)', { count: 'exact' })
+        .select(MAP_SELECT, { count: 'exact' })
         .range(from, to)
         .order('created_at', { ascending: false })
       if (categorie)  q = q.eq('categorie', categorie)
@@ -48,13 +57,21 @@ router.get('/', async (req, res, next) => {
       return res.json({ data, total: count, page: Number(page), limit: requestedLimit })
     }
 
-    // limit > 1000 : batchs de 1000
+    // limit > 1000 : batchs parallèles (au lieu de séquentiels)
     const { count, error: countErr } = await buildQuery(0, 0)
     if (countErr) throw countErr
     const total = count || 0
+    if (total === 0) return res.json({ data: [], total: 0, page: 1, limit: 0 })
+
+    const batchCount = Math.ceil(total / SUPABASE_MAX)
+    const results = await Promise.all(
+      Array.from({ length: batchCount }, (_, i) => {
+        const from = i * SUPABASE_MAX
+        return buildQuery(from, Math.min(from + SUPABASE_MAX - 1, total - 1))
+      })
+    )
     const allData = []
-    for (let from = 0; from < total; from += SUPABASE_MAX) {
-      const { data: batch, error: batchErr } = await buildQuery(from, Math.min(from + SUPABASE_MAX - 1, total - 1))
+    for (const { data: batch, error: batchErr } of results) {
       if (batchErr) throw batchErr
       allData.push(...(batch || []))
     }
