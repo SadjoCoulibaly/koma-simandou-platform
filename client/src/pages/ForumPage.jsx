@@ -812,11 +812,11 @@ export default function ForumPage() {
               >
                 ✉️ contact@koma-gn.com
               </button>
-              <a href="tel:+224000000000" style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 12, padding: '12px 24px', color: '#fff', textDecoration: 'none', fontSize: 14, fontWeight: 600, fontFamily: FB, transition: 'background .2s' }}
+              <a href="tel:+224620703714" style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 12, padding: '12px 24px', color: '#fff', textDecoration: 'none', fontSize: 14, fontWeight: 600, fontFamily: FB, transition: 'background .2s' }}
                 onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,.14)'}
                 onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,.08)'}
               >
-                📞 +224 621 727 276
+                📞 +224 620 70 37 14
               </a>
             </div>
             <div style={{ borderTop: '1px solid rgba(255,255,255,.08)', paddingTop: 40 }}>

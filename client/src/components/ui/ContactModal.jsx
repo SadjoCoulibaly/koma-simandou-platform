@@ -81,7 +81,7 @@ export default function ContactModal({ open, onClose, defaultSubject = '' }) {
           </button>
           <h2 style={{ fontFamily: HEAD, fontSize: 22, fontWeight: 800, color: '#fff', margin: '0 0 4px' }}>Nous contacter</h2>
           <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,.7)', margin: '0 0 6px' }}>Votre message sera transmis à notre équipe sous 24h.</p>
-          <a href="tel:+224621727276" style={{ fontSize: 13, color: 'rgba(255,255,255,.85)', textDecoration: 'none', fontFamily: FONT }}>📞 +224 621 727 276</a>
+          <a href="tel:+224620703714" style={{ fontSize: 13, color: 'rgba(255,255,255,.85)', textDecoration: 'none', fontFamily: FONT }}>📞 +224 620 70 37 14</a>
         </div>
 
         {/* Corps */}
