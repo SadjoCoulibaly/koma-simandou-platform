@@ -9,47 +9,58 @@ const HEAD = 'var(--font-heading)'
 export default function CompteActivePage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const [status, setStatus] = useState('loading') // loading | success | error
+  const [status, setStatus]           = useState('loading') // loading | pending | success | error
+  const [activationCode, setActivationCode] = useState(null)
 
   useEffect(() => {
-    const handleActivation = async () => {
-      // PKCE flow (Supabase v2 default): code in query string
-      const params = new URLSearchParams(window.location.search)
-      const code = params.get('code')
-      if (code) {
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-        if (data?.session) {
-          await supabase.auth.signOut()
-          setStatus('success')
-          setTimeout(() => navigate('/login'), 3000)
-        } else {
-          console.error('exchangeCodeForSession error:', error)
-          setStatus('error')
-        }
-        return
-      }
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get('code')
 
-      // Implicit flow fallback: access_token in hash
-      const hash = window.location.hash
-      if (hash.includes('access_token') && hash.includes('type=signup')) {
-        const { data: { session } } = await supabase.auth.getSession()
+    if (code) {
+      // Ne pas appeler exchangeCodeForSession ici.
+      // Les scanners d'email d'entreprise (Outlook Defender, Proofpoint…)
+      // pré-chargent les liens et exécutent le JS : le code serait consommé
+      // avant que l'utilisateur clique. On attend un geste explicite.
+      setActivationCode(code)
+      setStatus('pending')
+      return
+    }
+
+    // Implicit flow fallback (hash-based — moins exposé aux scanners)
+    const hash = window.location.hash
+    if (hash.includes('access_token') && hash.includes('type=signup')) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
-          await supabase.auth.signOut()
+          supabase.auth.signOut()
           setStatus('success')
           setTimeout(() => navigate('/login'), 3000)
         } else {
           setStatus('error')
         }
-        return
-      }
+      })
+      return
+    }
 
-      // Already logged in
-      const { data: { session } } = await supabase.auth.getSession()
+    // Aucun token dans l'URL
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) navigate('/login')
       else setStatus('error')
-    }
-    handleActivation()
+    })
   }, [navigate])
+
+  const handleActivate = async () => {
+    if (!activationCode) return
+    setStatus('loading')
+    const { data, error } = await supabase.auth.exchangeCodeForSession(activationCode)
+    if (data?.session) {
+      await supabase.auth.signOut()
+      setStatus('success')
+      setTimeout(() => navigate('/login'), 3000)
+    } else {
+      console.error('exchangeCodeForSession error:', error)
+      setStatus('error')
+    }
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--koma-teal-dark)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
@@ -77,6 +88,27 @@ export default function CompteActivePage() {
               <p style={{ fontSize: 14, color: '#6B7280', margin: 0, fontFamily: FONT }}>
                 {t('compte.loadingDesc')}
               </p>
+            </>
+          )}
+
+          {status === 'pending' && (
+            <>
+              <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--koma-teal-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--koma-teal)" strokeWidth="2.5" style={{ width: 28, height: 28 }}>
+                  <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--koma-teal-dark)', margin: '0 0 12px', fontFamily: HEAD }}>
+                Confirmez votre adresse email
+              </h2>
+              <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 28px', lineHeight: 1.6, fontFamily: FONT }}>
+                Votre lien d'activation est prêt. Cliquez sur le bouton ci-dessous pour activer votre compte.
+              </p>
+              <button
+                onClick={handleActivate}
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'var(--koma-teal)', color: 'white', border: 'none', padding: '13px 32px', borderRadius: 12, fontSize: 14, fontWeight: 700, fontFamily: FONT, cursor: 'pointer', width: '100%' }}>
+                Activer mon compte
+              </button>
             </>
           )}
 
@@ -109,8 +141,11 @@ export default function CompteActivePage() {
               <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--koma-teal-dark)', margin: '0 0 12px', fontFamily: HEAD }}>
                 {t('compte.errorTitle')}
               </h2>
-              <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 28px', lineHeight: 1.6, fontFamily: FONT }}>
+              <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 8px', lineHeight: 1.6, fontFamily: FONT }}>
                 {t('compte.errorDesc')}
+              </p>
+              <p style={{ fontSize: 13, color: '#9CA3AF', margin: '0 0 28px', lineHeight: 1.6, fontFamily: FONT }}>
+                Si votre lien est expiré ou déjà utilisé, contactez l'administrateur pour recevoir un nouveau lien d'activation.
               </p>
               <Link to="/login" style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--koma-teal-dark)', color: 'white', textDecoration: 'none', padding: '12px 28px', borderRadius: 12, fontSize: 14, fontWeight: 700, fontFamily: FONT }}>
                 {t('compte.loginAlt')}
