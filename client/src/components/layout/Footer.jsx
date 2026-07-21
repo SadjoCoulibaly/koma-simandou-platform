@@ -99,7 +99,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div style={{ borderTop: '1px solid rgba(255,255,255,.08)', textAlign: 'center', padding: '14px 24px 18px', fontSize: 11, color: 'rgba(255,255,255,.28)', fontFamily: FONT }}>
-          © {new Date().getFullYear()} SNICTEPS · Simandou 2040. Tous droits réservés.
+          © {new Date().getFullYear()} KOMA · Simandou 2040. Tous droits réservés.
         </div>
       </footer>
     </>
