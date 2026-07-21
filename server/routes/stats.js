@@ -93,18 +93,20 @@ router.get('/summary', requireAuth, requireAdmin, async (_req, res, next) => {
     const [
       { count: entreprises_total },
       { count: entreprises_attente },
-      { count: equipements_total },
+      { data: eqActifs },
       { count: equipements_attente },
       { count: projets_publics },
       { count: projets_prives },
     ] = await Promise.all([
       supabase.from('entreprises').select('*', { count: 'exact', head: true }),
       supabase.from('entreprises').select('*', { count: 'exact', head: true }).eq('statut', 'en_attente'),
-      supabase.from('equipements').select('*', { count: 'exact', head: true }),
+      supabase.from('equipements').select('quantite').eq('statut', 'actif'),
       supabase.from('equipements').select('*', { count: 'exact', head: true }).eq('statut', 'en_attente'),
       supabase.from('projets_publics').select('*', { count: 'exact', head: true }),
       supabase.from('projets_prives').select('*', { count: 'exact', head: true }),
     ])
+
+    const equipements_total = (eqActifs || []).reduce((s, r) => s + (r.quantite || 1), 0)
 
     res.json({
       entreprises: { total: entreprises_total, en_attente: entreprises_attente },
