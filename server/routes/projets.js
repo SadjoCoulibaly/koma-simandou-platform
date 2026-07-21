@@ -20,6 +20,17 @@ const PUBLIC_PROJ_PRIVE = [
   'image_url',
 ]
 
+// Colonnes renvoyées aux visiteurs non authentifiés — sans coordonnées soumissionnaire
+const PUBLIC_LIST_SELECT =
+  'id, secteur, titre, description, maitre_ouvrage, budget_estime, devise, ' +
+  'date_debut, date_fin_prevue, localisation, lots_sous_traitance, ' +
+  'contenu_local_pct, avancement_pct, image_url, statut, valide'
+
+const PUBLIC_PRIVES_SELECT =
+  'id, categorie, titre, description, promoteur, investissement_prevu, devise, ' +
+  'emplois_prevus, date_debut, localisation, statut, lots_sous_traitance, ' +
+  'contenu_local_pct, avancement_pct, image_url'
+
 function pick(obj, fields) {
   return Object.fromEntries(
     fields.filter(k => obj[k] !== undefined && obj[k] !== '' && obj[k] !== null)
@@ -35,7 +46,7 @@ router.get('/publics', async (req, res, next) => {
     const { page = 1, limit = 20, secteur, statut, search } = req.query
     const from = (Number(page) - 1) * Number(limit)
     const to   = from + Number(limit) - 1
-    let query = supabase.from('projets_publics').select('*', { count: 'exact' })
+    let query = supabase.from('projets_publics').select(PUBLIC_LIST_SELECT, { count: 'exact' })
       .eq('valide', true)
       .range(from, to).order('created_at', { ascending: false })
     if (secteur) query = query.eq('secteur', secteur)
@@ -66,8 +77,13 @@ router.get('/publics/admin', requireAuth, requireAdmin, async (req, res, next) =
 
 router.get('/publics/:id', async (req, res, next) => {
   try {
-    const { data, error } = await supabase.from('projets_publics').select('*').eq('id', req.params.id).single()
+    const { data, error } = await supabase.from('projets_publics')
+      .select(PUBLIC_LIST_SELECT)
+      .eq('id', req.params.id)
+      .eq('valide', true)
+      .maybeSingle()
     if (error) throw error
+    if (!data) return res.status(404).json({ message: 'Projet non trouvé' })
     res.json(data)
   } catch (err) { next(err) }
 })
@@ -118,7 +134,7 @@ router.get('/prives', async (req, res, next) => {
     const { page = 1, limit = 20, categorie, statut, search } = req.query
     const from = (Number(page) - 1) * Number(limit)
     const to   = from + Number(limit) - 1
-    let query = supabase.from('projets_prives').select('*', { count: 'exact' })
+    let query = supabase.from('projets_prives').select(PUBLIC_PRIVES_SELECT, { count: 'exact' })
       .range(from, to).order('created_at', { ascending: false })
     if (categorie) query = query.eq('categorie', categorie)
     if (statut)    query = query.eq('statut', statut)
@@ -131,8 +147,12 @@ router.get('/prives', async (req, res, next) => {
 
 router.get('/prives/:id', async (req, res, next) => {
   try {
-    const { data, error } = await supabase.from('projets_prives').select('*').eq('id', req.params.id).single()
+    const { data, error } = await supabase.from('projets_prives')
+      .select(PUBLIC_PRIVES_SELECT)
+      .eq('id', req.params.id)
+      .maybeSingle()
     if (error) throw error
+    if (!data) return res.status(404).json({ message: 'Projet non trouvé' })
     res.json(data)
   } catch (err) { next(err) }
 })

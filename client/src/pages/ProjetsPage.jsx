@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Search, FolderOpen, MapPin, TrendingUp, X, Calendar, Users, Building2, CheckSquare, Layers, Phone, Mail, User } from 'lucide-react'
+import { Search, FolderOpen, MapPin, TrendingUp, X, Calendar, Users, Building2, CheckSquare, Layers } from 'lucide-react'
 import { projetsPublicsApi, projetsPrivesApi } from '../lib/api'
 import { useTranslation } from 'react-i18next'
 
@@ -133,41 +133,6 @@ function ProjetModal({ projet, onClose, t }) {
               </div>
             )}
 
-            {/* ── Porteur de projet ── */}
-            {projet.soumis_par_nom && (
-              <div style={{ borderTop: '1px solid #f3f4f6', paddingTop: 16, marginTop: 6 }}>
-                <p style={{ margin: '0 0 12px', fontSize: 11, fontWeight: 700, color: 'var(--koma-teal)', textTransform: 'uppercase', letterSpacing: '.08em' }}>
-                  Porteur du projet
-                </p>
-                <div style={{ background: 'var(--koma-gray-bg)', borderRadius: 10, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--koma-teal-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <User size={16} color="var(--koma-teal)" />
-                    </div>
-                    <div>
-                      <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--koma-text)' }}>{projet.soumis_par_nom}</p>
-                      {projet.soumis_par_organisation && (
-                        <p style={{ margin: 0, fontSize: 12.5, color: '#6b7280' }}>{projet.soumis_par_organisation}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {projet.soumis_par_telephone && (
-                      <a href={`tel:${projet.soumis_par_telephone}`}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--koma-teal)', color: '#fff', textDecoration: 'none', borderRadius: 50, padding: '8px 16px', fontSize: 13, fontWeight: 700 }}>
-                        <Phone size={13} /> {projet.soumis_par_telephone}
-                      </a>
-                    )}
-                    {projet.soumis_par_email && (
-                      <a href={`mailto:${projet.soumis_par_email}`}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: 'var(--koma-teal)', textDecoration: 'none', borderRadius: 50, padding: '8px 16px', fontSize: 13, fontWeight: 700, border: '1.5px solid var(--koma-teal)' }}>
-                        <Mail size={13} /> {projet.soumis_par_email}
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
