@@ -46,7 +46,11 @@ router.get('/', async (req, res, next) => {
 
     let query = supabase
       .from('human_resources')
-      .select('*', { count: 'exact' })
+      .select(
+        'id, nom_complet, telephone, email, nationalite, fonction, ' +
+        'competences, projet_realise, disponibilite, localisation, photo_url, statut',
+        { count: 'exact' }
+      )
       .range(from, to)
       .order('created_at', { ascending: false })
 
@@ -65,7 +69,9 @@ router.get('/', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const { data, error } = await supabase
-      .from('human_resources').select('*')
+      .from('human_resources')
+      .select('id, nom_complet, telephone, email, nationalite, fonction, ' +
+              'competences, projet_realise, disponibilite, localisation, photo_url, statut')
       .eq('id', req.params.id)
       .eq('statut', 'actif')
       .single()

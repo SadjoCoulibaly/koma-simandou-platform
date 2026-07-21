@@ -5,6 +5,12 @@ import { sendEntrepriseInvite } from '../lib/email.js'
 
 const router = Router()
 
+// ── Cache mémoire serveur (2 minutes) ────────────────────────
+let _cache = null; let _cacheAt = 0
+const CACHE_TTL = 2 * 60_000
+
+router.use((req, _res, next) => { if (req.method !== 'GET') { _cache = null; _cacheAt = 0 }; next() })
+
 // Champs autorisés pour une soumission publique
 const PUBLIC_FIELDS = [
   'type', 'nom', 'rccm', 'nif', 'adresse', 'ville',
@@ -30,12 +36,23 @@ function pick(obj, fields) {
 router.get('/', async (req, res, next) => {
   try {
     const { page = 1, limit = 20, type, secteur, statut, search } = req.query
+    const isDefault = !type && !secteur && !statut && !search
+                   && Number(page) === 1 && Number(limit) === 20
+    if (isDefault && _cache && Date.now() - _cacheAt < CACHE_TTL) {
+      res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=300')
+      return res.json(_cache)
+    }
     const from = (Number(page) - 1) * Number(limit)
     const to   = from + Number(limit) - 1
 
     let query = supabase
       .from('entreprises')
-      .select('*', { count: 'exact' })
+      .select(
+        'id, type, nom, secteur, ville, logo_url, telephone, email, site_web, ' +
+        'statut, experience_simandou, effectifs, rccm, capital_social, ' +
+        'description, references_techniques, certifications',
+        { count: 'exact' }
+      )
       .range(from, to)
       .order('created_at', { ascending: false })
 
@@ -46,7 +63,12 @@ router.get('/', async (req, res, next) => {
 
     const { data, error, count } = await query
     if (error) throw error
-    res.json({ data, total: count, page: Number(page), limit: Number(limit) })
+    const result = { data, total: count, page: Number(page), limit: Number(limit) }
+    if (isDefault && (data?.length ?? 0) > 0) {
+      _cache = result; _cacheAt = Date.now()
+      res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=300')
+    }
+    res.json(result)
   } catch (err) { next(err) }
 })
 
@@ -122,7 +144,9 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res, next) => {
 router.post('/:id/invite', requireAuth, requireAdmin, async (req, res, next) => {
   try {
     const { data: entreprise, error: fetchError } = await supabase
-      .from('entreprises').select('*').eq('id', req.params.id).single()
+      .from('entreprises')
+      .select('id, nom, email, declarant_nom, declarant_email')
+      .eq('id', req.params.id).single()
     if (fetchError || !entreprise) return res.status(404).json({ message: 'Entreprise introuvable.' })
 
     const rawEmail = entreprise.declarant_email || entreprise.email

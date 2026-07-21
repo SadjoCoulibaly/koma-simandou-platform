@@ -20,6 +20,19 @@ const PUBLIC_PROJ_PRIVE = [
   'image_url',
 ]
 
+// ── Cache mémoire serveur (2 minutes) ────────────────────────
+let _cachePublics = null; let _cachePublicsAt = 0
+let _cachePrives  = null; let _cachePrivesAt  = 0
+const CACHE_TTL   = 2 * 60_000
+
+router.use((req, _res, next) => {
+  if (req.method !== 'GET') {
+    _cachePublics = null; _cachePublicsAt = 0
+    _cachePrives  = null; _cachePrivesAt  = 0
+  }
+  next()
+})
+
 // Colonnes renvoyées aux visiteurs non authentifiés — sans coordonnées soumissionnaire
 const PUBLIC_LIST_SELECT =
   'id, secteur, titre, description, maitre_ouvrage, budget_estime, devise, ' +
@@ -44,6 +57,12 @@ function pick(obj, fields) {
 router.get('/publics', async (req, res, next) => {
   try {
     const { page = 1, limit = 20, secteur, statut, search } = req.query
+    const isDefault = !secteur && !statut && !search
+                   && Number(page) === 1 && Number(limit) === 20
+    if (isDefault && _cachePublics && Date.now() - _cachePublicsAt < CACHE_TTL) {
+      res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=300')
+      return res.json(_cachePublics)
+    }
     const from = (Number(page) - 1) * Number(limit)
     const to   = from + Number(limit) - 1
     let query = supabase.from('projets_publics').select(PUBLIC_LIST_SELECT, { count: 'exact' })
@@ -54,7 +73,12 @@ router.get('/publics', async (req, res, next) => {
     if (search)  query = query.ilike('titre', `%${search}%`)
     const { data, error, count } = await query
     if (error) throw error
-    res.json({ data, total: count, page: Number(page), limit: Number(limit) })
+    const result = { data, total: count, page: Number(page), limit: Number(limit) }
+    if (isDefault && (data?.length ?? 0) > 0) {
+      _cachePublics = result; _cachePublicsAt = Date.now()
+      res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=300')
+    }
+    res.json(result)
   } catch (err) { next(err) }
 })
 
@@ -132,6 +156,12 @@ router.delete('/publics/:id', requireAuth, requireAdmin, async (req, res, next) 
 router.get('/prives', async (req, res, next) => {
   try {
     const { page = 1, limit = 20, categorie, statut, search } = req.query
+    const isDefault = !categorie && !statut && !search
+                   && Number(page) === 1 && Number(limit) === 20
+    if (isDefault && _cachePrives && Date.now() - _cachePrivesAt < CACHE_TTL) {
+      res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=300')
+      return res.json(_cachePrives)
+    }
     const from = (Number(page) - 1) * Number(limit)
     const to   = from + Number(limit) - 1
     let query = supabase.from('projets_prives').select(PUBLIC_PRIVES_SELECT, { count: 'exact' })
@@ -141,7 +171,12 @@ router.get('/prives', async (req, res, next) => {
     if (search)    query = query.ilike('titre', `%${search}%`)
     const { data, error, count } = await query
     if (error) throw error
-    res.json({ data, total: count, page: Number(page), limit: Number(limit) })
+    const result = { data, total: count, page: Number(page), limit: Number(limit) }
+    if (isDefault && (data?.length ?? 0) > 0) {
+      _cachePrives = result; _cachePrivesAt = Date.now()
+      res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=300')
+    }
+    res.json(result)
   } catch (err) { next(err) }
 })
 

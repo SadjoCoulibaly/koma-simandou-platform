@@ -42,14 +42,6 @@ function EquipementModal({ eq, onClose, t }) {
             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: '#0D3A29', fontFamily: 'var(--font-heading)', lineHeight: 1.2 }}>{eq.marque_modele}</h2>
           </div>
 
-          {/* Description */}
-          {eq.description && (
-            <div style={{ background: '#F5F8F6', borderRadius: 12, padding: '12px 16px', marginBottom: 18 }}>
-              <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, color: '#8A9A90', textTransform: 'uppercase', letterSpacing: '.06em' }}>Description</p>
-              <p style={{ margin: 0, fontSize: 13.5, color: '#2D3A32', lineHeight: 1.7 }}>{eq.description}</p>
-            </div>
-          )}
-
           {/* Infos grille */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
             {[
