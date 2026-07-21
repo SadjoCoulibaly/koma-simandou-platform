@@ -88,18 +88,18 @@ export default function Footer() {
               <button onClick={() => setContactOpen(true)} style={{ color: 'rgba(255,255,255,.45)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontFamily: FONT, padding: 0 }}>
                 contact@koma-gn.com
               </button>
-              <a href="tel:+224621727276" style={{ color: 'rgba(255,255,255,.45)', textDecoration: 'none', fontSize: 12, fontFamily: FONT, transition: 'color .15s' }}
+              <a href="tel:+224620703714" style={{ color: 'rgba(255,255,255,.45)', textDecoration: 'none', fontSize: 12, fontFamily: FONT, transition: 'color .15s' }}
                 onMouseOver={e => e.currentTarget.style.color = 'rgba(255,255,255,.8)'}
                 onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,.45)'}>
-                +224 621 727 276
+                +224 620 70 37 14
               </a>
             </div>
           </div>
         </div>
 
-        {/* Signature développeur */}
+        {/* Copyright */}
         <div style={{ borderTop: '1px solid rgba(255,255,255,.08)', textAlign: 'center', padding: '14px 24px 18px', fontSize: 11, color: 'rgba(255,255,255,.28)', fontFamily: FONT }}>
-          {t('footer.signature')} <strong style={{ color: 'rgba(255,255,255,.4)', fontWeight: 600 }}>YawiGroup Sarl</strong>
+          © {new Date().getFullYear()} SNICTEPS · Simandou 2040. Tous droits réservés.
         </div>
       </footer>
     </>
